@@ -1,0 +1,37 @@
+#!/usr/bin/env node
+"use strict"
+
+var
+  isPass= /password/i,
+  any= /./g
+
+function maskpass(o){
+	var
+	  res= {}
+	for(var i in o){
+		var
+		  raw= o[i],
+		  val= isPass.test(i) ? raw.toString().replace(any, "*") : raw
+		res[i]= val
+	}
+	return res
+}
+
+module.exports= maskpass
+module.exports.maskpass= maskpass
+
+if(require.main === module){
+	var
+	  chunks= []
+	process.stdin.setEncoding("utf8")
+	process.stdin.on("data", function(d){
+		chunks.push(d)
+	})
+	process.stdin.on("end", function(){
+		var
+		  text= chunks.join(""),
+		  json= JSON.parse(text),
+		  masked= maskpass(json)
+		console.log(JSON.stringify(masked))
+	})
+}
